@@ -3,7 +3,7 @@ from django.urls import path
 from staff.apps import StaffConfig
 from staff.views import EmployeeListAPIView, EmployeeCreateAPIView, EmployeeUpdateAPIView, EmployeeDestroyAPIView, \
     EmployeeRetrieveAPIView, TaskListAPIView, TaskCreateAPIView, TaskUpdateAPIView, TaskDestroyAPIView, \
-    TaskRetrieveAPIView, EmployeeWithTaskListAPIView
+    TaskRetrieveAPIView, EmployeeWithTaskListAPIView, ImportantTasksListAPIView
 
 app_name = StaffConfig.name
 
@@ -24,4 +24,7 @@ urlpatterns = [
 
     # Урл для получения списка сотрудников вместе с их задачами
     path('employee_with_task_list/', EmployeeWithTaskListAPIView.as_view(), name='employee_with_task-list'),
+
+    # Урл для получения информации в виде {важная задача, срок, [фио сотрудника]}
+    path('important_tasks_list/', ImportantTasksListAPIView.as_view(), name='important_tasks-list'),
 ]

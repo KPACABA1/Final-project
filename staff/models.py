@@ -17,7 +17,7 @@ class Employee(models.Model):
 class Task(models.Model):
     """Модель задачи."""
     title = models.CharField(max_length=50, verbose_name='Название')
-    parent_task= models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
+    parent_task = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, verbose_name='Исполнитель',
                                  related_name='employee_task', null=True, blank=True)
     date = models.DateField(verbose_name='До какого числа нужно выполнить')

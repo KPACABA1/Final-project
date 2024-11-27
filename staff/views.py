@@ -1,8 +1,10 @@
+from django.db.models import OuterRef, Exists
 from rest_framework import filters
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
 
 from staff.models import Employee, Task
-from staff.serializers import EmployeeSerializer, TaskSerializer, EmployeeWithTaskSerializer, TaskCreateSerializer
+from staff.serializers import EmployeeSerializer, TaskSerializer, EmployeeWithTaskSerializer, TaskCreateSerializer, \
+    ImportantTasksSerializer
 
 
 class EmployeeListAPIView(ListAPIView):
@@ -85,3 +87,17 @@ class EmployeeWithTaskListAPIView(ListAPIView):
     # Сортировка по задачам
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ('task_count',)
+
+
+class ImportantTasksListAPIView(ListAPIView):
+    """Класс, который получает список задач не взятых в работу, но от которых зависят другие задачи и выводит
+    {важная задача, срок, [фио сотрудника]}"""
+    # Этот подзапрос создает набор всех дочерних задач, где поле parent_task связано с текущим объектом задачи
+    # (используется OuterRef для ссылки на внешний запрос).
+    subqueries = Task.objects.filter(parent_task=OuterRef('pk'))
+
+    #  Этот шаг добавляет аннотацию has_children, которая показывает, существуют ли дочерние задачи для текущей задачи.
+    #  Если существует хотя бы одна дочерняя задача, то has_children будет True. А также фильтр выбирает только те
+    #  задачи, которые являются корневыми и у которых есть хотя бы одна дочерняя задача и нет назначенного сотрудника.
+    queryset = Task.objects.annotate(has_children=Exists(subqueries)).filter(has_children=True, employee=None)
+    serializer_class = ImportantTasksSerializer

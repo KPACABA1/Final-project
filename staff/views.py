@@ -91,7 +91,7 @@ class EmployeeWithTaskListAPIView(ListAPIView):
 
 class ImportantTasksListAPIView(ListAPIView):
     """Класс, который получает список задач не взятых в работу, но от которых зависят другие задачи и выводит
-    {важная задача, срок, [фио сотрудника]}"""
+    {важная задача, срок, фио сотрудника}"""
     # Этот подзапрос создает набор всех дочерних задач, где поле parent_task связано с текущим объектом задачи
     # (используется OuterRef для ссылки на внешний запрос).
     subqueries = Task.objects.filter(parent_task=OuterRef('pk'))

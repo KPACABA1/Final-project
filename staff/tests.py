@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from staff.models import Employee
+from staff.models import Employee, Task
 
 
 class EmployeeTestCase(APITestCase):
@@ -97,6 +97,114 @@ class EmployeeTestCase(APITestCase):
                 "full_name": self.employee.full_name,
                 "post": self.employee.post,
                 "task_count": self.employee.task_count
+            }
+        ]
+        data = response.json()
+        self.assertEqual(
+            data, result
+        )
+
+class TaskTestCase(APITestCase):
+    """Тесты для CRUD задач."""
+    def setUp(self):
+        """Создаю пользователя и задачу для тестов"""
+        self.employee = Employee.objects.create(full_name='test_1', post='test_1', task_count=1)
+        self.task = Task.objects.create(title='test_1', employee=self.employee, date='2024-02-02')
+
+    def test_employee_create(self):
+        """Тест на создание задачи и добавление +1 к списку задач сотрудника, к которому относится эта задача."""
+        # Arrange(подготавливаю данные для теста)
+        url = reverse('staff:task-create')
+
+        # Act(совершаю действие которое тестирую)
+        data = {'title': 'test_2', 'parent_task': self.task.pk, 'employee': self.employee.pk, 'date': '2024-02-02'}
+        response = self.client.post(url, data)
+
+        # Assert(делаю проверки)
+        self.assertEqual(
+            response.status_code, status.HTTP_201_CREATED
+        )
+        self.assertEqual(
+            Task.objects.all().count(), 2
+        )
+        self.assertEqual(
+            Employee.objects.get(pk=self.employee.pk, task_count=2), self.employee
+        )
+
+    def test_task_update(self):
+        """Тест на обновление задачи."""
+        # Arrange(подготавливаю данные для теста)
+        url = reverse('staff:task-update', args=(self.task.pk,))
+
+        # Act(совершаю действие которое тестирую)
+        data = {'title': 'test_new'}
+        response = self.client.patch(url, data)
+        data = response.json()
+
+        # Assert(делаю проверки)
+        self.assertEqual(
+            response.status_code, status.HTTP_200_OK
+        )
+        self.assertEqual(
+            data.get('title'), 'test_new'
+        )
+
+    def test_task_delete(self):
+        """Тест на удаление задачи."""
+        # Arrange(подготавливаю данные для теста)
+        url = reverse('staff:task-destroy', args=(self.task.pk,))
+
+        # Act(совершаю действие которое тестирую)
+        response = self.client.delete(url)
+
+        # Assert(делаю проверки)
+        self.assertEqual(
+            response.status_code, status.HTTP_204_NO_CONTENT
+        )
+        self.assertEqual(
+            Task.objects.all().count(), 0
+        )
+        self.assertEqual(
+            Employee.objects.get(pk=self.employee.pk, task_count=0), self.employee
+        )
+
+    def test_task_retrieve(self):
+        """Тест на детальный просмотр задачи."""
+        # Arrange(подготавливаю данные для теста)
+        url = reverse('staff:task-retrieve', args=(self.task.pk,))
+
+        # Act(совершаю действие которое тестирую)
+        response = self.client.get(url)
+        data = response.json()
+
+        # Assert(делаю проверки)
+        self.assertEqual(
+            response.status_code, status.HTTP_200_OK
+        )
+        self.assertEqual(
+            data.get('title'), self.task.title
+        )
+
+    def test_task_list(self):
+        """Тест на просмотр всех задач."""
+        # Arrange(подготавливаю данные для теста)
+        url = reverse('staff:task-list')
+
+        # Act(совершаю действие которое тестирую)
+        response = self.client.get(url)
+
+        # Assert(делаю проверки)
+        self.assertEqual(
+            response.status_code, status.HTTP_200_OK
+        )
+        result = [
+            {
+                "id": self.task.pk,
+                "title": self.task.title,
+                "date": self.task.date,
+                "status": self.task.status,
+                "parent_task": self.task.parent_task,
+                "employee": self.task.employee.pk
             }
         ]
         data = response.json()

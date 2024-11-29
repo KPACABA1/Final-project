@@ -65,11 +65,11 @@ class EmployeeWithTaskSerializer(ModelSerializer):
 
 
 class ImportantTasksSerializer(ModelSerializer):
-    """Сериализатор для важных задач"""
+    """Сериализатор для важных задач."""
     employee = SerializerMethodField()
 
     def get_employee(self, task):
-        """Метод для поиска сотрудника для задачи"""
+        """Метод для поиска сотрудника для задачи."""
         # Получил сотрудника с минимальным количеством задач
         employee_with_minimum_number_of_tasks = Employee.objects.order_by('task_count').first()
 
@@ -81,8 +81,8 @@ class ImportantTasksSerializer(ModelSerializer):
             try:
                 employee_performing_parent_task = Employee.objects.get(pk=parent_task.employee.pk)
 
-                # Сравниваю у кого сколько задач и если у сотрудника выполняющего родительскую задачу задач максимум на 2
-                # больше чем у наименее загруженного сотрудника, то отдаю сотруднику выполняющего родительскую задачу
+                # Сравниваю у кого сколько задач и если у сотрудника выполняющего родительскую задачу задач максимум на
+                # 2 больше чем у наименее загруженного сотрудника, то отдаю сотруднику выполняющего родительскую задачу
                 if employee_performing_parent_task.task_count - employee_with_minimum_number_of_tasks.task_count <= 2:
                     return employee_performing_parent_task.full_name
 

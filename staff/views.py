@@ -14,7 +14,7 @@ class EmployeeListAPIView(ListAPIView):
 
 
 class EmployeeRetrieveAPIView(RetrieveAPIView):
-    """Класс для просмотра детальной информации о сотруднике"""
+    """Класс для просмотра детальной информации о сотруднике."""
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
@@ -45,7 +45,7 @@ class TaskListAPIView(ListAPIView):
 
 
 class TaskRetrieveAPIView(RetrieveAPIView):
-    """Класс для просмотра детальной информации о задаче"""
+    """Класс для просмотра детальной информации о задаче."""
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
@@ -81,7 +81,7 @@ class TaskDestroyAPIView(DestroyAPIView):
 
 
 class EmployeeWithTaskListAPIView(ListAPIView):
-    """Класс выводит список сотрудников с их задачами и общим количеством задач с возможностью сортировки"""
+    """Класс выводит список сотрудников с их задачами и общим количеством задач с возможностью сортировки."""
     queryset = Employee.objects.all()
     serializer_class = EmployeeWithTaskSerializer
     # Сортировка по задачам
@@ -91,7 +91,7 @@ class EmployeeWithTaskListAPIView(ListAPIView):
 
 class ImportantTasksListAPIView(ListAPIView):
     """Класс, который получает список задач не взятых в работу, но от которых зависят другие задачи и выводит
-    {важная задача, срок, фио сотрудника}"""
+    {важная задача, срок, фио сотрудника}."""
     # Этот подзапрос создает набор всех дочерних задач, где поле parent_task связано с текущим объектом задачи
     # (используется OuterRef для ссылки на внешний запрос).
     subqueries = Task.objects.filter(parent_task=OuterRef('pk'))

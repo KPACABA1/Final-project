@@ -8,7 +8,7 @@ from staff.models import Employee, Task
 class EmployeeTestCase(APITestCase):
     """Тесты для CRUD сотрудников."""
     def setUp(self):
-        """Создаю пользователя для тестов"""
+        """Создаю пользователя для тестов."""
         self.employee = Employee.objects.create(full_name='test_1', post='test_1')
 
     def test_employee_create(self):
@@ -104,10 +104,11 @@ class EmployeeTestCase(APITestCase):
             data, result
         )
 
+
 class TaskTestCase(APITestCase):
     """Тесты для CRUD задач."""
     def setUp(self):
-        """Создаю пользователя и задачу для тестов"""
+        """Создаю пользователя и задачу для тестов."""
         self.employee = Employee.objects.create(full_name='test_1', post='test_1', task_count=1)
         self.task = Task.objects.create(title='test_1', employee=self.employee, date='2024-02-02')
 
@@ -150,7 +151,7 @@ class TaskTestCase(APITestCase):
         )
 
     def test_task_delete(self):
-        """Тест на удаление задачи."""
+        """Тест на удаление задачи с проверкой, что и у пользователя назначенного на эту задачу она удаляется."""
         # Arrange(подготавливаю данные для теста)
         url = reverse('staff:task-destroy', args=(self.task.pk,))
 
@@ -212,11 +213,12 @@ class TaskTestCase(APITestCase):
             data, result
         )
 
+
 class EmployeeWithTaskTestCase(APITestCase):
     """Тесты для контроллера, который выводит список сотрудников с их задачами и общим количеством задач с возможностью
     сортировки."""
     def setUp(self):
-        """Создаю пользователя и задачу для тестов"""
+        """Создаю пользователя и задачу для тестов."""
         self.employee = Employee.objects.create(full_name='test_1', post='test_1')
         self.task = Task.objects.create(title='test_1', employee=self.employee, date='2024-02-02')
 
@@ -248,13 +250,14 @@ class EmployeeWithTaskTestCase(APITestCase):
             data, result
         )
 
+
 class ImportantTasksTestCase(APITestCase):
     """Тесты для контроллера, который получает список задач не взятых в работу, но от которых зависят другие задачи и
     выводит {важная задача, срок, фио сотрудника}."""
     def setUp(self):
         """Создаю 2 пользователя и 2 группы из задач:
-        1. Задача с сотрудником -> задача без сотрудника -> задача с сотрудником
-        2. Задача без сотрудника -> задача с сотрудником"""
+        1. Задача с сотрудником -> задача без сотрудника -> задача с сотрудником;
+        2. Задача без сотрудника -> задача с сотрудником."""
         self.employee_1 = Employee.objects.create(full_name='test_1', post='test_1', task_count=2)
         self.employee_2 = Employee.objects.create(full_name='test_2', post='test_2', task_count=1)
         self.task_1 = Task.objects.create(title='test_1', employee=self.employee_1, date='2024-02-02')

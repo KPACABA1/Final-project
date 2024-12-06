@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -26,6 +27,7 @@ INSTALLED_APPS = [
     'staff',
     'django_filters',
     'drf_yasg',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -99,4 +101,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Настройки для фильтрации
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+# Настройки для Celery
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+# Настойки для подключения Redis к Celery
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+
+# Настройка для Django Celery Beat
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_BEAT_SCHEDULE = {
+    'assignment_tasks_to_employees': {
+        "task": 'staff.tasks.assignment_tasks_to_employees',
+        "schedule": timedelta(minutes=1),  # run at every 5th minute
+    },
 }
